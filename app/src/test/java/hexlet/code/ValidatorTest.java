@@ -8,87 +8,76 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ValidatorTest {
 
     @Test
-    void testRequired() {
+    void testNumberSchema() {
         var validator = new Validator();
-        var schema = validator.string();
+        var schema = validator.number();
 
-        // До required() null и пустая строка валидны
+        assertTrue(schema.isValid(5));
         assertTrue(schema.isValid(null));
-        assertTrue(schema.isValid(""));
+
+        schema.positive();
+
+        assertTrue(schema.isValid(null));
+        assertTrue(schema.isValid(10));
+        assertFalse(schema.isValid(-10));
+        assertFalse(schema.isValid(0));
 
         schema.required();
 
         assertFalse(schema.isValid(null));
-        assertFalse(schema.isValid(""));
-        assertTrue(schema.isValid("hexlet"));
-        assertTrue(schema.isValid("what does the fox say"));
+        assertTrue(schema.isValid(10));
     }
 
     @Test
-    void testMinLength() {
+    void testNumberRange() {
         var validator = new Validator();
-        var schema = validator.string();
+        var schema = validator.number();
 
-        schema.minLength(5);
+        schema.range(5, 10);
 
-        // Без required() отсутствующие значения валидны
-        assertTrue(schema.isValid(null));
-        assertTrue(schema.isValid(""));
+        assertTrue(schema.isValid(5));
+        assertTrue(schema.isValid(10));
+        assertTrue(schema.isValid(7));
 
-        assertFalse(schema.isValid("hex"));
-        assertTrue(schema.isValid("hexle"));
-        assertTrue(schema.isValid("hexlet"));
+        assertFalse(schema.isValid(4));
+        assertFalse(schema.isValid(11));
     }
 
     @Test
-    void testContains() {
+    void testNumberRangeReplacement() {
         var validator = new Validator();
-        var schema = validator.string();
+        var schema = validator.number();
 
-        schema.contains("hex");
+        schema.range(5, 10);
 
-        assertTrue(schema.isValid(null));
-        assertTrue(schema.isValid(""));
-        assertTrue(schema.isValid("hexlet"));
-        assertTrue(schema.isValid("I love hexlet"));
-        assertFalse(schema.isValid("hello"));
+        assertTrue(schema.isValid(5));
+        assertTrue(schema.isValid(10));
+
+        schema.range(6, 9);
+
+        assertFalse(schema.isValid(5));
+        assertFalse(schema.isValid(10));
+        assertTrue(schema.isValid(6));
+        assertTrue(schema.isValid(9));
     }
 
     @Test
-    void testRulesTogether() {
+    void testNumberRulesTogether() {
         var validator = new Validator();
 
-        var schema = validator.string()
+        var schema = validator.number()
                 .required()
-                .minLength(5)
-                .contains("hex");
+                .positive()
+                .range(5, 10);
 
         assertFalse(schema.isValid(null));
-        assertFalse(schema.isValid(""));
-        assertFalse(schema.isValid("hex"));
-        assertFalse(schema.isValid("hello"));
-        assertTrue(schema.isValid("hexlet"));
-    }
+        assertFalse(schema.isValid(-5));
+        assertFalse(schema.isValid(0));
+        assertFalse(schema.isValid(4));
 
-    @Test
-    void testRuleReplacement() {
-        var validator = new Validator();
+        assertTrue(schema.isValid(5));
+        assertTrue(schema.isValid(10));
 
-        var schema = validator.string();
-
-        schema.contains("wh");
-        assertTrue(schema.isValid("what does the fox say"));
-
-        schema.contains("what");
-        assertTrue(schema.isValid("what does the fox say"));
-
-        schema.contains("whatthe");
-        assertFalse(schema.isValid("what does the fox say"));
-
-        var schema2 = validator.string();
-
-        schema2.minLength(10).minLength(4);
-
-        assertTrue(schema2.isValid("Hexlet"));
+        assertFalse(schema.isValid(11));
     }
 }
