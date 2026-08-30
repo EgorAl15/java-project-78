@@ -21,4 +21,34 @@ public class MapSchema extends BaseSchema<Map<?, ?>> {
 
         return this;
     }
+
+    public MapSchema shape(Map<String, BaseSchema<String>> schemas) {
+        addConstraint(
+                "shape",
+                value -> {
+                    if (value == null) {
+                        return true;
+                    }
+
+                    for (var entry : schemas.entrySet()) {
+                        var key = entry.getKey();
+                        var schema = entry.getValue();
+
+                        Object fieldValue = value.get(key);
+
+                        if (!(fieldValue == null || fieldValue instanceof String)) {
+                            return false;
+                        }
+
+                        if (!schema.isValid((String) fieldValue)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+        );
+
+        return this;
+    }
 }
