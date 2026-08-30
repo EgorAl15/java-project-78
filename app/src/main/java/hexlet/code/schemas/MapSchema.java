@@ -5,18 +5,14 @@ import java.util.Map;
 public class MapSchema extends BaseSchema<Map<?, ?>> {
 
     public MapSchema required() {
-        addConstraint(
-                "required",
-                value -> value != null
-        );
-
+        setRequired(true);
         return this;
     }
 
     public MapSchema sizeof(int size) {
         addConstraint(
                 "sizeof",
-                value -> value == null || value.size() == size
+                value -> value.size() == size
         );
 
         return this;
@@ -26,10 +22,6 @@ public class MapSchema extends BaseSchema<Map<?, ?>> {
         addConstraint(
                 "shape",
                 value -> {
-                    if (value == null) {
-                        return true;
-                    }
-
                     for (var entry : schemas.entrySet()) {
                         var key = entry.getKey();
                         var schema = entry.getValue();
