@@ -2,32 +2,24 @@ package hexlet.code.schemas;
 
 public class StringSchema extends BaseSchema<String> {
 
-    public StringSchema required() {
-        setRequired(true);
+  public StringSchema() {
+    addConstraint("required", value -> value != null && !value.isEmpty());
+  }
 
-        addConstraint(
-                "required",
-                value -> !value.isEmpty()
-        );
+  public StringSchema required() {
+    setRequired();
+    return this;
+  }
 
-        return this;
-    }
+  public StringSchema minLength(int length) {
+    addConstraint("minLength", value -> value.length() >= length);
 
-    public StringSchema minLength(int length) {
-        addConstraint(
-                "minLength",
-                value -> value.isEmpty() || value.length() >= length
-        );
+    return this;
+  }
 
-        return this;
-    }
+  public StringSchema contains(String substring) {
+    addConstraint("contains", value -> value.contains(substring));
 
-    public StringSchema contains(String substring) {
-        addConstraint(
-                "contains",
-                value -> value.isEmpty() || value.contains(substring)
-        );
-
-        return this;
-    }
+    return this;
+  }
 }

@@ -4,43 +4,43 @@ import java.util.Map;
 
 public class MapSchema extends BaseSchema<Map<?, ?>> {
 
-    public MapSchema required() {
-        setRequired(true);
-        return this;
-    }
+  public MapSchema() {
+    addConstraint("required", value -> value != null);
+  }
 
-    public MapSchema sizeof(int size) {
-        addConstraint(
-                "sizeof",
-                value -> value.size() == size
-        );
+  public MapSchema required() {
+    setRequired();
+    return this;
+  }
 
-        return this;
-    }
+  public MapSchema sizeof(int size) {
+    addConstraint("sizeof", value -> value.size() == size);
 
-    public MapSchema shape(Map<String, BaseSchema<String>> schemas) {
-        addConstraint(
-                "shape",
-                value -> {
-                    for (var entry : schemas.entrySet()) {
-                        var key = entry.getKey();
-                        var schema = entry.getValue();
+    return this;
+  }
 
-                        Object fieldValue = value.get(key);
+  public MapSchema shape(Map<String, BaseSchema<String>> schemas) {
+    addConstraint(
+        "shape",
+        value -> {
+          for (var entry : schemas.entrySet()) {
+            var key = entry.getKey();
+            var schema = entry.getValue();
 
-                        if (!(fieldValue == null || fieldValue instanceof String)) {
-                            return false;
-                        }
+            Object fieldValue = value.get(key);
 
-                        if (!schema.isValid((String) fieldValue)) {
-                            return false;
-                        }
-                    }
+            if (!(fieldValue == null || fieldValue instanceof String)) {
+              return false;
+            }
 
-                    return true;
-                }
-        );
+            if (!schema.isValid((String) fieldValue)) {
+              return false;
+            }
+          }
 
-        return this;
-    }
+          return true;
+        });
+
+    return this;
+  }
 }
